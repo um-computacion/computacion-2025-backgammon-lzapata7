@@ -1,4 +1,4 @@
-from ficha import ficha
+from checker import checker
 
 class Board:
     
