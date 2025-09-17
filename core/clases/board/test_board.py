@@ -187,6 +187,48 @@ class TestBoard(unittest.TestCase):
         self.assertTrue(success)
         self.assertEqual(self.board.get_point_count(2), 1)
         self.assertEqual(self.board.get_point_color(2), "white")
+
+     def test_add_checker_to_invalid_point(self):
+        
+        checker = Checker("white")
+        success = self.board.add_checker_to_point(0, checker)
+        self.assertFalse(success)
+        
+        success = self.board.add_checker_to_point(25, checker)
+        self.assertFalse(success)
+    
+    def test_add_checker_to_blocked_point(self):
+        
+        checker = Checker("white")
+        success = self.board.add_checker_to_point(13, checker) 
+        self.assertFalse(success)
+    
+    def test_remove_checker_successful(self):
+        
+        initial_count = self.board.get_point_count(1)
+        removed_checker = self.board.remove_checker_from_point(1, "white")
+        
+        self.assertIsNotNone(removed_checker)
+        self.assertEqual(removed_checker.get_color(), "white")
+        self.assertEqual(self.board.get_point_count(1), initial_count - 1)
+    
+    def test_remove_checker_from_empty_point(self):
+        
+        removed_checker = self.board.remove_checker_from_point(2, "white")
+        self.assertIsNone(removed_checker)
+    
+    def test_remove_checker_wrong_color(self):
+        
+        removed_checker = self.board.remove_checker_from_point(1, "black")  # Punto 1 tiene fichas blancas
+        self.assertIsNone(removed_checker)
+    
+    def test_remove_checker_from_invalid_point(self):
+        
+        removed_checker = self.board.remove_checker_from_point(0, "white")
+        self.assertIsNone(removed_checker)
+        
+        removed_checker = self.board.remove_checker_from_point(25, "white")
+        self.assertIsNone(removed_checker)
     
 
 if __name__ == "__main__":
