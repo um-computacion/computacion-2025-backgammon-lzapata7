@@ -132,6 +132,37 @@ class TestDice(unittest.TestCase):
         original_moves = self.dice.get_available_moves()
         self.assertNotIn(99, original_moves)
         self.assertEqual(len(original_moves), 2)
+        
+
+    @patch('random.randint')
+    def test_multiple_rolls(self, mock_randint):
+        
+       
+        mock_randint.side_effect = [1, 2]
+        die1, die2 = self.dice.roll()
+        self.assertEqual((die1, die2), (1, 2))
+        
+        # Segunda tirada (resetear el mock)
+        mock_randint.side_effect = [6, 6]
+        die1, die2 = self.dice.roll()
+        self.assertEqual((die1, die2), (6, 6))
+        self.assertTrue(self.dice.is_double())
+        self.assertEqual(len(self.dice.get_available_moves()), 4)
+    
+    def test_partial_move_usage(self):
+        
+        
+        self.dice._Dice__die1__ = 2
+        self.dice._Dice__die2__ = 2
+        self.dice._Dice__moves_available__ = [2, 2, 2, 2]
+        
+        
+        self.assertTrue(self.dice.use_move(2))
+        self.assertTrue(self.dice.use_move(2))
+        
+        
+        self.assertTrue(self.dice.has_moves())
+        self.assertEqual(len(self.dice.get_available_moves()), 2)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
