@@ -86,7 +86,52 @@ class TestDice(unittest.TestCase):
         success = self.dice.use_move(2)
         self.assertFalse(success)
         self.assertEqual(len(self.dice.get_available_moves()), 2)
-
+  
+  
+    def test_use_move_from_empty_list(self):
+       
+        success = self.dice.use_move(3)
+        self.assertFalse(success)
+        self.assertFalse(self.dice.has_moves())
+    
+    def test_use_all_moves(self):
+        
+        self.dice._Dice__die1__ = 2
+        self.dice._Dice__die2__ = 4
+        self.dice._Dice__moves_available__ = [2, 4]
+        
+        self.assertTrue(self.dice.use_move(2))
+        self.assertTrue(self.dice.use_move(4))
+        
+        self.assertFalse(self.dice.has_moves())
+        self.assertEqual(len(self.dice.get_available_moves()), 0)
+    
+    def test_use_all_double_moves(self):
+        
+        self.dice._Dice__die1__ = 6
+        self.dice._Dice__die2__ = 6
+        self.dice._Dice__moves_available__ = [6, 6, 6, 6]
+        
+       
+        for i in range(4):
+            success = self.dice.use_move(6)
+            self.assertTrue(success)
+            self.assertEqual(len(self.dice.get_available_moves()), 3 - i)
+       
+        self.assertFalse(self.dice.has_moves())
+        self.assertFalse(self.dice.use_move(6))
+    
+    def test_get_available_moves_returns_copy(self):
+        
+        self.dice._Dice__moves_available__ = [3, 5]
+        
+        moves = self.dice.get_available_moves()
+        moves.append(99)  
+        
+        
+        original_moves = self.dice.get_available_moves()
+        self.assertNotIn(99, original_moves)
+        self.assertEqual(len(original_moves), 2)
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
