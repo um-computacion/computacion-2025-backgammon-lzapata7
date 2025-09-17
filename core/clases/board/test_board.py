@@ -230,6 +230,93 @@ class TestBoard(unittest.TestCase):
         removed_checker = self.board.remove_checker_from_point(25, "white")
         self.assertIsNone(removed_checker)
     
+     def test_get_all_points_returns_copy(self):
+        
+        all_points = self.board.get_all_points()
+        self.assertEqual(len(all_points), 24)
+        
+        # Modificar la lista devuelta
+        all_points[0].append(Checker("white"))
+        
+        # Verificar que el tablero original no se modificó
+        original_point = self.board.get_point(1)
+        self.assertNotEqual(len(all_points[0]), len(original_point))
+    
+    def test_is_home_board_white(self):
+        """Test de verificación de tablero casa para fichas blancas."""
+        # Tablero casa de blancas: puntos 19-24
+        self.assertTrue(self.board.is_home_board(19, "white"))
+        self.assertTrue(self.board.is_home_board(20, "white"))
+        self.assertTrue(self.board.is_home_board(24, "white"))
+        
+        # No tablero casa
+        self.assertFalse(self.board.is_home_board(18, "white"))
+        self.assertFalse(self.board.is_home_board(1, "white"))
+        self.assertFalse(self.board.is_home_board(12, "white"))
+    
+    def test_is_home_board_black(self):
+        """Test de verificación de tablero casa para fichas negras."""
+        # Tablero casa de negras: puntos 1-6
+        self.assertTrue(self.board.is_home_board(1, "black"))
+        self.assertTrue(self.board.is_home_board(3, "black"))
+        self.assertTrue(self.board.is_home_board(6, "black"))
+        
+        # No tablero casa
+        self.assertFalse(self.board.is_home_board(7, "black"))
+        self.assertFalse(self.board.is_home_board(24, "black"))
+        self.assertFalse(self.board.is_home_board(13, "black"))
+    
+    def test_empty_board_setup(self):
+        """Test de tablero vacío."""
+        # Crear tablero vacío
+        empty_board = Board()
+        for point in empty_board._Board__points__:
+            point.clear()
+        
+        # Verificar que todos los puntos están vacíos
+        for i in range(1, 25):
+            self.assertTrue(empty_board.is_point_empty(i))
+            self.assertIsNone(empty_board.get_point_color(i))
+            self.assertEqual(empty_board.get_point_count(i), 0)
+    
+    def test_point_operations_boundary_cases(self):
+        """Test de operaciones en casos límite."""
+        # Punto en límite inferior
+        self.assertIsInstance(self.board.get_point_count(1), int)
+        self.assertIsInstance(self.board.get_point_color(1), str)
+        
+        # Punto en límite superior
+        self.assertIsInstance(self.board.get_point_count(24), int)
+        self.assertIsInstance(self.board.get_point_color(24), str)
+    
+    def test_multiple_moves_same_point(self):
+        """Test de múltiples movimientos hacia el mismo punto."""
+        # Mover varias fichas al mismo punto vacío
+        checker1 = Checker("white")
+        checker2 = Checker("white")
+        
+        success1 = self.board.add_checker_to_point(2, checker1)
+        success2 = self.board.add_checker_to_point(2, checker2)
+        
+        self.assertTrue(success1)
+        self.assertTrue(success2)
+        self.assertEqual(self.board.get_point_count(2), 2)
+        self.assertEqual(self.board.get_point_color(2), "white")
+    
+    def test_setup_initial_position_called_multiple_times(self):
+        """Test de que setup_initial_position se puede llamar múltiples veces."""
+        initial_state = self.board.get_all_points()
+        
+        # Llamar setup nuevamente
+        self.board._setup_initial_position()
+        
+        new_state = self.board.get_all_points()
+        
+        # Verificar que el estado es el mismo
+        for i in range(24):
+            self.assertEqual(len(initial_state[i]), len(new_state[i]))
+
+    
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
